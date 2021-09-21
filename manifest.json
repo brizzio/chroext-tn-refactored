@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "TN SCRAPER BOT",
+  "version": "1.0",
+  "description": "This extension works on Telhanorte site",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions":["tabs", 
+    "webNavigation",
+    "http://*/*", 
+    "https://*/*",
+    "webRequest",
+    "webRequestBlocking",
+    "downloads"],
+
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_security_policy": "script-src 'self' https://apis.google.com/js/api.js 'unsafe-eval'; object-src 'self'"
+
+}

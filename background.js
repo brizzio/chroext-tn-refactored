@@ -53,12 +53,36 @@ async function buttonClicked(tab) {
   runningTab = tab.id
   runningUrl = host
   console.log("vai fazer update na aba", runningTab);
-  var cl = await goToPage(host, "tn-classificacao.json", runningTab,'classificacao.js');
-  console.log("retornou a classificacao na call", cl);
+  var cl = await goToPage(host, "tn-classificacao.json", runningTab,'classificacao.js').then(async function(classData){
+    console.log("entrou no then", classData);
+    //loop as urls da classificação
+    var sortimento = []
+    for(let i=0; i<2; i++) {
+			// navigate to next url
+      var classItem = classData[i]
+      var productPageData = await goToPage(classItem.url, false, runningTab,'products.js')
+      .then(function(arr){
+        return arr.map(function(item){
+          return {...classItem,...item}
+        })
+      })
+			sortimento.push(productPageData);
+			
+			// wait for 5 seconds
+			//await waitSeconds(5);
+		}
+
+    return sortimento
+
+  }).then(function(srt){
+    console.log("resultado do scan", srt);
+  })
+};
+  
   
   // Send a message to the tab that is open when button was clicked
   //chrome.tabs.sendMessage(tab.id, {"message": "browser action"});
-}
+
 
 
 
@@ -82,9 +106,11 @@ async function goToPage(url, filename, tab_id,scriptFile) {
 					// save data from message to a JSON file and download
 					let json = JSON.parse(message)
           console.log('retornou', json)
-					let blob = new Blob([JSON.stringify(json)], {type: "application/json;charset=utf-8"});
+					/* 
+          DOWNLAD DATA
+          let blob = new Blob([JSON.stringify(json)], {type: "application/json;charset=utf-8"});
 					let objectURL = URL.createObjectURL(blob);
-					chrome.downloads.download({ url: objectURL, filename: filename, conflictAction: 'overwrite' });
+					chrome.downloads.download({ url: objectURL, filename: filename, conflictAction: 'overwrite' }); */
           resolve(json.data)
 				});
 
